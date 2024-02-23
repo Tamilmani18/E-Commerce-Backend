@@ -29,7 +29,8 @@ const router = express.Router();
 router.get("/", getHome);
 
 // API for uploading image
-router.use("/images", express.static("upload/images"));
+router.use("/images", express.static(path.join(__dirname, '/upload/images')));
+// router.use("/images", express.static("upload/images"));
 router.post("/upload", upload.single("product"), uploadImage);
 
 // API for adding product
