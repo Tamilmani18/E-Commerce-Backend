@@ -40,7 +40,7 @@ const upload = multer({ storage: storage });
 const uploadImage = (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`,
+    image_url: `${baseUrl}/images/${req.file.filename}`,
   });
 };
 
