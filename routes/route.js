@@ -3,10 +3,9 @@ const cors = require("cors");
 const app = express();
 const path = require("path");
 
-// Middleware
-
+// Middlewares
 app.use(express.json());
-app.use(cors()); // Enable CORS for all routes
+app.use(cors());
 
 const {
   getHome,
@@ -30,8 +29,8 @@ const router = express.Router();
 router.get("/", getHome);
 
 // API for displaying images
-// router.use("/images", express.static(path.join(__dirname, '/upload/images')));
-router.use("/images", express.static("upload/images"));
+router.use("/images", express.static(path.join(__dirname, '/upload/images')));
+// router.use("/images", express.static("upload/images"));
 
 // API for uploading image
 router.post("/upload", upload.single("product"), uploadImage);
