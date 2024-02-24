@@ -30,8 +30,7 @@ const router = express.Router();
 router.get("/", getHome);
 
 // API for displaying images
-router.use("/upload/images", express.static(path.join(__dirname, '/upload/images')));
-// router.use("/upload/images", express.static("upload/images"));
+router.use("/images", express.static(path.join(__dirname, '/upload/images')));
 // router.use("/images", express.static("upload/images"));
 
 // API for uploading image
