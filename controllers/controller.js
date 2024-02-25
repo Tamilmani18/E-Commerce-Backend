@@ -6,8 +6,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-require("dotenv").config();
-const { baseUrl } = require('../controllers/Url/Urls.js');
+require("dotenv").config(); 
 
 // Middleware
 
@@ -15,6 +14,7 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
 
 const port = process.env.PORT;
+const baseUrl = process.env.BASE_URL;
 
 // API Creation for default route
 
