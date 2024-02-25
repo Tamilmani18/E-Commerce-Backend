@@ -39,6 +39,8 @@ const upload = multer({ storage: storage });
 // API for Uploading Images
 
 const uploadImage = (req, res) => {
+  console.log("Uploaded Image:", req.file);
+  
   res.json({
     success: 1,
     image_url: `${baseUrl}/images/${req.file.filename}`,
