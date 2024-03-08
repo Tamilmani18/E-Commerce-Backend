@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const image = require("./Image");
 
 // Schema for Creating Products
 
@@ -11,10 +12,9 @@ const Product = mongoose.model("Product", {
     type: String,
     required: true,
   },
-  image: {
-    type: String,
-    required: true,
-  },
+  
+  image,
+
   category: {
     type: String,
     required: true,

@@ -1,12 +1,14 @@
 const Product = require("../models/Product");
 const Users = require("../models/User.js");
 const multer = require("multer");
+const image = require("../models/Image");
+const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-require("dotenv").config(); 
+require("dotenv").config();
 
 // Middleware
 
@@ -25,7 +27,9 @@ const getHome = (req, res) => {
 // Image Storage Engine
 
 const storage = multer.diskStorage({
-  destination: "./upload/images",
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../uploads"));
+  },
   filename: (req, file, cb) => {
     return cb(
       null,
@@ -40,10 +44,28 @@ const upload = multer({ storage: storage });
 
 const uploadImage = (req, res) => {
   console.log("Uploaded Image:", req.file);
-  
+
+  const saveImage = new image({
+    name: req.file.filename,
+    img: {
+      data: fs.readFileSync(
+        path.join(__dirname + "/uploads/" + req.file.filename)
+      ),
+      contentType: "image/png",
+    },
+  });
+
+  saveImage.save((err, item) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("An error occurred", err);
+    }
+    res.send("Image has been saved to database");
+  });
+
   res.json({
     success: 1,
-    image_url: `${baseUrl}/images/${req.file.filename}`,
+    image_url: `${baseUrl}/uploads/${req.file.filename}`,
   });
 };
 
