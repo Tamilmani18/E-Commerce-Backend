@@ -1,7 +1,6 @@
 const Product = require("../models/Product");
 const Users = require("../models/User.js");
 const multer = require("multer");
-const image = require("../models/Image");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
@@ -28,7 +27,7 @@ const getHome = (req, res) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads"));
+    cb(null, "uploads");
   },
   filename: (req, file, cb) => {
     return cb(
@@ -45,23 +44,22 @@ const upload = multer({ storage: storage });
 const uploadImage = (req, res) => {
   console.log("Uploaded Image:", req.file);
 
-  const saveImage = new image({
+  const saveImage = new Product.image({
     name: req.file.filename,
     img: {
-      data: fs.readFileSync(
-        path.join(__dirname + "../uploads/" + req.file.filename)
-      ),
+      data: fs.readFileSync("uploads/", req.file.filename),
       contentType: "image/png",
     },
   });
 
-  saveImage.save((err, item) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send("An error occurred", err);
-    }
-    res.send("Image has been saved to database");
-  });
+  saveImage
+    .save()
+    .then((res) => {
+      console.log("Image Saved");
+    })
+    .catch((err) => {
+      console.log("Error in Saving Image");
+    });
 
   res.json({
     success: 1,
