@@ -49,7 +49,7 @@ const uploadImage = (req, res) => {
     name: req.file.filename,
     img: {
       data: fs.readFileSync(
-        path.join(__dirname + "/uploads/" + req.file.filename)
+        path.join(__dirname + "../uploads/" + req.file.filename)
       ),
       contentType: "image/png",
     },
