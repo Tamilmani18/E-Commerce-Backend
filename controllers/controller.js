@@ -47,7 +47,7 @@ const uploadImage = (req, res) => {
   const saveImage = new Product.image({
     name: req.file.filename,
     img: {
-      data: fs.readFileSync("uploads/", req.file.filename),
+      data: fs.readFileSync("uploads/" + req.file.filename),
       contentType: "image/png",
     },
   });
