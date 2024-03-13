@@ -278,8 +278,8 @@ const getCart = async (req, res) => {
 
 module.exports = {
   getHome,
-  upload,
-  uploadImage,
+  // upload,
+  // uploadImage,
   getImages,
   addProduct,
   removeProduct,

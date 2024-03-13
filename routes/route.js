@@ -9,7 +9,7 @@ app.use(cors());
 
 const {
   getHome,
-  uploadImage,
+  // uploadImage,
   getImages,
   addProduct,
   removeProduct,
@@ -22,7 +22,7 @@ const {
   removeFromCart,
   getCart,
   fetchUser,
-  upload,
+  // upload,
 } = require("../controllers/controller");
 const router = express.Router();
 
