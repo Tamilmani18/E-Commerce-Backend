@@ -35,7 +35,7 @@ router.use("/uploads", express.static('uploads'));
 router.get("/getImage", getImages);
 
 // API for uploading image
-router.post("/upload", upload.single("product"), uploadImage);
+// router.post("/upload", upload.single("product"), uploadImage);
 
 // API for adding product
 router.post("/addproduct", addProduct);

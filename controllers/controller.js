@@ -1,22 +1,18 @@
 const Product = require("../models/Product");
 const Users = require("../models/User.js");
-const multer = require("multer");
-const fs = require("fs");
 const jwt = require("jsonwebtoken");
-const path = require("path");
+// const multer = require("multer");
+// const path = require("path");
 const express = require("express");
 const cors = require("cors");
-const { error } = require("console");
 const app = express();
+const cloudinary = require("../utils/cloudinary.js");
 require("dotenv").config();
 
 // Middleware
 
 app.use(express.json());
-app.use(cors()); // Enable CORS for all routes
-
-const port = process.env.PORT;
-const baseUrl = process.env.BASE_URL;
+app.use(cors());
 
 // API Creation for default route
 
@@ -26,37 +22,37 @@ const getHome = (req, res) => {
 
 // Image Storage Engine
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads/"));
-  },
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, path.join(__dirname, "../uploads/"));
+//   },
+//   filename: (req, file, cb) => {
+//     return cb(
+//       null,
+//       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+//     );
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 // API for Uploading Images
 
-const uploadImage = async (req, res) => {
-  const imageBuffer = req.file.buffer;
+// const uploadImage = async (req, res) => {
+//   const imageBuffer = req.file.buffer;
 
-  try {
-    const product = new Product({
-      image: imageBuffer,
-    });
+//   try {
+//     const product = new Product({
+//       image: imageBuffer,
+//     });
 
-    await product.save();
-    res.json({ status: "Image Uploaded" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: "Error uploading image" });
-  }
-};
+//     await product.save();
+//     res.json({ status: "Image Uploaded" });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ status: "Error uploading image" });
+//   }
+// };
 
 // API for getting images
 
@@ -65,7 +61,7 @@ const getImages = async (req, res) => {
     const products = await Product.find({});
     const images = products.map((product) => ({
       id: product.id,
-      image: product.image.toString("base64"),
+      imageUrl: product.image.url,
     }));
     res.json({ status: "Images Fetched", images });
   } catch (error) {
@@ -86,10 +82,16 @@ const addProduct = async (req, res) => {
   } else {
     id = 1;
   }
+  const result = await cloudinary.uploader.upload(req.body.image, {
+    folder: "products",
+  });
   const product = new Product({
     id: id,
     name: req.body.name,
-    image: req.body.image,
+    image: {
+      public_id: result.public_id,
+      url: result.secure_url,
+    },
     category: req.body.category,
     new_price: req.body.new_price,
     old_price: req.body.old_price,
@@ -106,6 +108,10 @@ const addProduct = async (req, res) => {
 // API for removing product
 
 const removeProduct = async (req, res) => {
+  const imgId = req.body.image.public_id;
+  if (imgId) {
+    await cloudinary.uploader.destroy(imgId);
+  }
   await Product.findOneAndDelete({ id: req.body.id });
   console.log("Removed");
   res.json({
