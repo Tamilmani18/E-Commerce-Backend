@@ -10,6 +10,7 @@ app.use(cors());
 const {
   getHome,
   uploadImage,
+  getImages,
   addProduct,
   removeProduct,
   getAllProducts,
@@ -30,7 +31,8 @@ router.get("/", getHome);
 
 // API for displaying images
 router.use("/uploads", express.static('uploads'));
-// router.use("/images", express.static("upload/images"));
+
+router.get("/getImage", getImages);
 
 // API for uploading image
 router.post("/upload", upload.single("product"), uploadImage);

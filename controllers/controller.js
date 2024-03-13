@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
+const { error } = require("console");
 const app = express();
 require("dotenv").config();
 
@@ -41,32 +42,36 @@ const upload = multer({ storage: storage });
 
 // API for Uploading Images
 
-const uploadImage = (req, res) => {
-  console.log("Uploaded Image:", req.file);
+const uploadImage = async (req, res) => {
+  const imageBuffer = req.file.buffer;
 
-  const saveImage = new Product.image({
-    name: req.file.filename,
-    img: {
-      data: fs.readFileSync(
-        path.join(__dirname, "../uploads/") + req.file.filename
-      ),
-      contentType: "image/png",
-    },
-  });
-
-  saveImage
-    .save()
-    .then((res) => {
-      console.log("Image Saved");
-    })
-    .catch((err) => {
-      console.log("Error in Saving Image");
+  try {
+    const product = new Product({
+      image: imageBuffer,
     });
 
-  res.json({
-    success: 1,
-    image_url: `${baseUrl}/uploads/${req.file.filename}`,
-  });
+    await product.save();
+    res.json({ status: "Image Uploaded" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "Error uploading image" });
+  }
+};
+
+// API for getting images
+
+const getImages = async (req, res) => {
+  try {
+    const products = await Product.find({});
+    const images = products.map((product) => ({
+      id: product.id,
+      image: product.image.toString("base64"),
+    }));
+    res.json({ status: "Images Fetched", images });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "Error fetching images" });
+  }
 };
 
 // API for adding product
@@ -269,6 +274,7 @@ module.exports = {
   getHome,
   upload,
   uploadImage,
+  getImages,
   addProduct,
   removeProduct,
   getAllProducts,
