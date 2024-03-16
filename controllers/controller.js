@@ -2,6 +2,7 @@ const Product = require("../models/Product");
 const Users = require("../models/User.js");
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const multer = require("multer");
 const cors = require("cors");
 const app = express();
 const cloudinary = require("../utils/cloudinary.js");
@@ -34,39 +35,59 @@ const getImages = async (req, res) => {
   }
 };
 
+// Set up multer for file uploads
+const upload = multer({ dest: "uploads/" });
+
 // API for adding product
 
 const addProduct = async (req, res) => {
-  let products = await Product.find({});
-  let id;
-  if (products.length > 0) {
-    let last_product_array = products.slice(-1);
-    let last_product = last_product_array[0];
-    id = last_product.id + 1;
-  } else {
-    id = 1;
+  try {
+    // Use multer upload middleware to handle file upload
+    upload.single("image")(req, res, async (err) => {
+      if (err) {
+        console.error("Error uploading file:", err);
+        return res
+          .status(400)
+          .json({ success: false, error: "File upload failed" });
+      }
+
+      // Now the uploaded file is available in req.file
+      const file = req.file;
+
+      // Upload image to Cloudinary
+      const cloudinaryResponse = await cloudinary.uploader.upload(file.path, {
+        folder: "products",
+      });
+
+      // Extract URL from Cloudinary response
+      const imageUrl = cloudinaryResponse.secure_url;
+
+      // Create a new product object
+      const product = new Product({
+        name: req.body.name,
+        image: imageUrl,
+        category: req.body.category,
+        new_price: req.body.new_price,
+        old_price: req.body.old_price,
+      });
+
+      // Save product to database
+      await product.save();
+      console.log("Saved");
+
+      res.json({
+        success: true,
+        name: req.body.name,
+        imageUrl: imageUrl,
+      });
+    });
+  } catch (error) {
+    console.error("Error adding product:", error);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred while adding the product",
+    });
   }
-  const result = await cloudinary.uploader.upload(req.body.image, {
-    folder: "products",
-  });
-  const product = new Product({
-    id: id,
-    name: req.body.name,
-    image: {
-      public_id: result.public_id,
-      url: result.secure_url,
-    },
-    category: req.body.category,
-    new_price: req.body.new_price,
-    old_price: req.body.old_price,
-  });
-  console.log(product);
-  await product.save();
-  console.log("Saved");
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
 };
 
 // API for removing product
