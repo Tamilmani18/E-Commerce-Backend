@@ -1,8 +1,6 @@
 const Product = require("../models/Product");
 const Users = require("../models/User.js");
 const jwt = require("jsonwebtoken");
-// const multer = require("multer");
-// const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -19,40 +17,6 @@ app.use(cors());
 const getHome = (req, res) => {
   res.send("Express App is Running");
 };
-
-// Image Storage Engine
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, path.join(__dirname, "../uploads/"));
-//   },
-//   filename: (req, file, cb) => {
-//     return cb(
-//       null,
-//       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-//     );
-//   },
-// });
-
-// const upload = multer({ storage: storage });
-
-// API for Uploading Images
-
-// const uploadImage = async (req, res) => {
-//   const imageBuffer = req.file.buffer;
-
-//   try {
-//     const product = new Product({
-//       image: imageBuffer,
-//     });
-
-//     await product.save();
-//     res.json({ status: "Image Uploaded" });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ status: "Error uploading image" });
-//   }
-// };
 
 // API for getting images
 
@@ -278,8 +242,6 @@ const getCart = async (req, res) => {
 
 module.exports = {
   getHome,
-  // upload,
-  // uploadImage,
   getImages,
   addProduct,
   removeProduct,
