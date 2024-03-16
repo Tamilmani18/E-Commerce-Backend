@@ -35,9 +35,6 @@ const getImages = async (req, res) => {
   }
 };
 
-// Set up multer for file uploads
-const upload = multer({ dest: "uploads/" });
-
 // API for adding product
 
 const addProduct = async (req, res) => {
@@ -51,21 +48,20 @@ const addProduct = async (req, res) => {
           .json({ success: false, error: "File upload failed" });
       }
 
-      // Now the uploaded file is available in req.file
-      const file = req.file;
-
       // Upload image to Cloudinary
-      const cloudinaryResponse = await cloudinary.uploader.upload(file.path, {
+      const result = await cloudinary.uploader.upload(image, {
         folder: "products",
       });
 
       // Extract URL from Cloudinary response
-      const imageUrl = cloudinaryResponse.secure_url;
-
+      const imageUrl = result.secure_url;
       // Create a new product object
       const product = new Product({
         name: req.body.name,
-        image: imageUrl,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url,
+        },
         category: req.body.category,
         new_price: req.body.new_price,
         old_price: req.body.old_price,
